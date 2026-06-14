@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Pengisian EV — PLN Indonesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-bg-hover: rgba(255,255,255,0.10);
+    --glass-border: rgba(255,255,255,0.12);
+    --glass-border-hover: rgba(255,255,255,0.22);
+    --glass-active-border: rgba(99,179,237,0.6);
+    --glass-active-bg: rgba(99,179,237,0.12);
+    --glass-green-border: rgba(72,199,142,0.6);
+    --glass-green-bg: rgba(72,199,142,0.1);
+    --glass-amber-border: rgba(251,191,36,0.55);
+    --glass-amber-bg: rgba(251,191,36,0.09);
+    --accent-blue: #63b3ed;
+    --accent-green: #48c78e;
+    --accent-amber: #fbbf24;
+    --accent-purple: #a78bfa;
+    --text-primary: rgba(255,255,255,0.92);
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.35);
+    --blur: blur(20px);
+    --blur-sm: blur(12px);
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+  }
+
+  html { font-size: 15px; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #060b17;
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 32px 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(56,97,188,0.28) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -15%;
+    right: -10%;
+    width: 55%;
+    height: 55%;
+    background: radial-gradient(ellipse, rgba(20,150,100,0.22) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-orb {
+    position: fixed;
+    top: 30%;
+    right: 5%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(120,80,200,0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 36px;
+    padding: 24px 28px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+  }
+
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(99,179,237,0.25), rgba(99,179,237,0.08));
+    border: 1px solid rgba(99,179,237,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  .header-text p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--accent-green);
+    background: rgba(72,199,142,0.12);
+    border: 1px solid rgba(72,199,142,0.25);
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ─── GLASS CARD ─── */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .glass-card:hover {
+    border-color: var(--glass-border-hover);
+  }
+
+  .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .card-title-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .icon-blue { background: rgba(99,179,237,0.15); color: var(--accent-blue); }
+  .icon-green { background: rgba(72,199,142,0.15); color: var(--accent-green); }
+  .icon-amber { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
+  .icon-purple { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+
+  /* ─── CHIP GRIDS ─── */
+  .chip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 10px;
+  }
+
+  .chip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: var(--radius-md);
+    padding: 13px 14px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+
+  .chip:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-1px);
+  }
+
+  .chip-icon {
+    font-size: 20px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .chip-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .chip-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: block;
+  }
+
+  .chip-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .chip.active-blue {
+    background: var(--glass-active-bg);
+    border-color: var(--glass-active-border);
+    box-shadow: 0 0 0 1px rgba(99,179,237,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .chip.active-blue .chip-name, .chip.active-blue .chip-icon { color: var(--accent-blue); }
+  .chip.active-blue .chip-value { color: #90cdf4; }
+
+  .chip.active-green {
+    background: var(--glass-green-bg);
+    border-color: var(--glass-green-border);
+    box-shadow: 0 0 0 1px rgba(72,199,142,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .chip.active-green .chip-name, .chip.active-green .chip-icon { color: var(--accent-green); }
+  .chip.active-green .chip-value { color: #9ae6b4; }
+
+  .chip.active-amber {
+    background: var(--glass-amber-bg);
+    border-color: var(--glass-amber-border);
+    box-shadow: 0 0 0 1px rgba(251,191,36,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .chip.active-amber .chip-name, .chip.active-amber .chip-icon { color: var(--accent-amber); }
+  .chip.active-amber .chip-value { color: #fde68a; }
+
+  .chip-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.08);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* ─── TARIF CHIP specific ─── */
+  .tarif-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 20px 0;
+  }
+
+  /* ─── FORM CONTROLS ─── */
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .glass-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .glass-input:focus {
+    border-color: rgba(99,179,237,0.5);
+    background: rgba(99,179,237,0.06);
+  }
+
+  .glass-input::-webkit-inner-spin-button { opacity: 0.4; }
+
+  /* ─── RANGE SLIDER ─── */
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slider-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.12);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    box-shadow: 0 0 8px rgba(99,179,237,0.5);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); border: none; cursor: pointer;
+  }
+
+  .slider-green input[type=range]::-webkit-slider-thumb { background: var(--accent-green); box-shadow: 0 0 8px rgba(72,199,142,0.4); }
+
+  /* ─── TWO-COL ─── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:540px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ─── BATTERY VISUAL ─── */
+  .batt-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .batt-body {
+    position: relative;
+    width: 88px;
+    height: 42px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.2);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .batt-body::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 18px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .batt-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #48c78e, #38d9a9);
+    border-radius: 5px 0 0 5px;
+    transition: width 0.4s ease;
+  }
+
+  .batt-pct {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  /* ─── PRESET PILLS ─── */
+  .preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .preset-pill {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .preset-pill:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  .prog-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .prog-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .prog-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #48c78e, #63b3ed);
+    border-radius: 4px;
+    transition: width 0.45s cubic-bezier(0.25,0.46,0.45,0.94);
+    position: relative;
+  }
+
+  .prog-fill::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -2px;
+    width: 12px;
+    height: 12px;
+    background: #90cdf4;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(99,179,237,0.7);
+  }
+
+  /* ─── MODE DROPDOWN ─── */
+  .mode-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .mode-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .glass-select {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 36px 9px 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .glass-select:focus {
+    border-color: rgba(99,179,237,0.5);
+    background-color: rgba(99,179,237,0.07);
+  }
+
+  .glass-select option {
+    background: #0e1628;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .mode-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: var(--text-secondary);
+  }
+
+  .cap-warning {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: var(--radius-sm);
+    padding: 9px 14px;
+    font-size: 12px;
+    color: rgba(253,230,138,0.85);
+    line-height: 1.5;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* ─── INFO HINT ─── */
+  .hint-box {
+    background: rgba(99,179,237,0.06);
+    border: 1px solid rgba(99,179,237,0.15);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: rgba(144,205,244,0.8);
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+
+  /* ─── RESULTS AREA ─── */
+  .results-section {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-xl);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    overflow: hidden;
+  }
+
+  .results-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .results-header-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  @media(max-width:540px) {
+    .results-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .res-cell {
+    padding: 22px 20px;
+    border-right: 1px solid rgba(255,255,255,0.07);
+    text-align: center;
+  }
+
+  .res-cell:last-child { border-right: none; }
+
+  .res-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+    line-height: 1.1;
+  }
+
+  .res-unit {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 3px;
+  }
+
+  .res-lbl {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 6px;
+  }
+
+  .res-cell.highlight .res-val { color: var(--accent-blue); }
+  .res-cell.highlight-green .res-val { color: var(--accent-green); }
+  .res-cell.highlight-amber .res-val { color: var(--accent-amber); }
+  .res-cell.highlight-purple .res-val { color: var(--accent-purple); }
+
+  /* ─── BREAKDOWN TABLE ─── */
+  .breakdown {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .breakdown-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  .brow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+
+  .brow:last-child { border-bottom: none; }
+
+  .brow-label { color: var(--text-secondary); }
+
+  .brow-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .brow.total-row {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .brow.total-row .brow-val { color: var(--accent-blue); font-size: 16px; }
+
+  /* ─── FOOTER NOTE ─── */
+  .result-note {
+    padding: 14px 24px;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .glass-card, .results-section {
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .glass-card:nth-child(1) { animation-delay: 0.05s; }
+  .glass-card:nth-child(2) { animation-delay: 0.10s; }
+  .glass-card:nth-child(3) { animation-delay: 0.15s; }
+  .glass-card:nth-child(4) { animation-delay: 0.20s; }
+  .results-section         { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<div class="bg-orb"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-icon">⚡</div>
+    <div class="header-text">
+      <h1>Kalkulator Pengisian EV</h1>
+      <p>Estimasi waktu &amp; biaya berdasarkan tarif resmi PLN 2025</p>
+    </div>
+    <div class="header-badge">Permen ESDM 1/2023</div>
+  </div>
+
+  <!-- LOKASI -->
+  <div class="glass-card">
+    <div class="card-title">
+      <span class="card-title-icon icon-green">📍</span>
+      Lokasi Pengisian
+    </div>
+    <div class="chip-grid" id="loc-grid"></div>
+    <div class="hint-box" id="loc-hint"></div>
+  </div>
+
+  <!-- KECEPATAN CHARGER -->
+  <div class="glass-card">
+    <div class="card-title">
+      <span class="card-title-icon icon-amber">🔌</span>
+      Kecepatan Charger
+    </div>
+    <div class="chip-grid" id="speed-grid"></div>
+  </div>
+
+  <!-- TARIF PLN -->
+  <div class="glass-card">
+    <div class="card-title">
+      <span class="card-title-icon icon-blue">💡</span>
+      Tarif Listrik PLN — Klik Golongan Anda
+    </div>
+    <div class="tarif-grid" id="tarif-grid"></div>
+    <div class="hint-box" style="margin-top:12px">
+      Untuk SPKLU, tarif dasar sudah otomatis Rp 2.466/kWh sesuai regulasi. Harga tarif rumah tangga berlaku untuk pengisian di rumah.
+    </div>
+  </div>
+
+  <!-- BATERAI & KWH -->
+  <div class="glass-card">
+    <div class="card-title">
+      <span class="card-title-icon icon-green">🔋</span>
+      Kapasitas &amp; Kondisi Baterai
+    </div>
+
+    <div class="grid2">
+      <div>
+        <label class="field-label">Kapasitas baterai kendaraan</label>
+        <div class="preset-row" id="batt-presets"></div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <input type="number" class="glass-input" id="batt-cap" value="60" min="1" max="500" step="0.1" style="flex:1">
+          <span style="font-size:13px; color:var(--text-muted); white-space:nowrap">kWh</span>
+        </div>
+        <span style="font-size:11px; color:var(--text-muted); margin-top:6px; display:block">Contoh: 77,4 / 82 / 100 kWh</span>
+      </div>
+      <div>
+        <label class="field-label">SoC baterai saat ini</label>
+        <div class="batt-wrap">
+          <div class="batt-body">
+            <div class="batt-fill" id="batt-fill" style="width:20%"></div>
+            <span class="batt-pct" id="batt-pct-lbl">20%</span>
+          </div>
+          <span style="font-size:13px; color:var(--text-secondary)">Mulai dari <strong id="soc-from-lbl" style="color:var(--text-primary); font-family:'Space Grotesk',sans-serif">20%</strong></span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <input type="number" class="glass-input" id="soc-from" value="20" min="0" max="95" step="1" style="flex:1" oninput="syncSoc()">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:var(--accent-green); min-width:36px">%</span>
+        </div>
+        <span style="font-size:11px; color:var(--text-muted); margin-top:6px; display:block">Masukkan angka 0–95</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="divider"></div>
+
+    <div class="mode-row">
+      <span class="mode-label">Mode input</span>
+      <select class="glass-select" id="input-mode" onchange="switchMode()">
+        <option value="kwh">⚡ Input kWh yang masuk</option>
+        <option value="menit">⏱ Input durasi (menit)</option>
+      </select>
+      <span class="mode-badge" id="mode-equiv-badge"></span>
+    </div>
+
+    <div id="panel-kwh">
+      <label class="field-label">Jumlah kWh yang mau masuk</label>
+      <div class="preset-row" id="target-presets"></div>
+      <div class="slider-row" style="margin-bottom:10px">
+        <input type="range" id="kwh-range" min="1" max="150" value="40" step="0.5">
+        <span class="slider-val" id="kwh-out">40,0 kWh</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span style="font-size:12px; color:var(--text-muted)">Atau ketik:</span>
+        <input type="number" class="glass-input" id="kwh-manual" value="40" min="0.5" max="300" step="0.5" style="width:100px">
+        <span style="font-size:13px; color:var(--text-muted)">kWh</span>
+      </div>
+      <div class="cap-warning" id="kwh-warning">⚠ Nilai melebihi sisa kapasitas baterai. Dibatasi otomatis ke <strong id="kwh-cap-val"></strong> kWh (100% penuh).</div>
+    </div>
+
+    <div id="panel-menit" style="display:none">
+      <label class="field-label">Durasi pengisian</label>
+      <div class="preset-row" id="menit-presets"></div>
+      <div class="slider-row" style="margin-bottom:10px">
+        <input type="range" id="menit-range" min="1" max="600" value="60" step="1">
+        <span class="slider-val" style="color:var(--accent-purple); min-width:60px" id="menit-out">60 menit</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px">
+        <span style="font-size:12px; color:var(--text-muted)">Atau ketik:</span>
+        <input type="number" class="glass-input" id="menit-manual" value="60" min="1" max="1440" step="1" style="width:100px">
+        <span style="font-size:13px; color:var(--text-muted)">menit</span>
+      </div>
+      <div class="cap-warning" id="menit-warning">⚠ Durasi ini melebihi waktu untuk mengisi penuh. Dibatasi ke <strong id="menit-cap-val"></strong> menit (baterai 100%).</div>
+    </div>
+
+    <div style="margin-top:18px">
+      <div class="prog-header">
+        <span id="prog-from-lbl">Dari 20%</span>
+        <span>Estimasi target: <strong id="prog-to-lbl" style="color:var(--text-primary)">87%</strong></span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" id="prog-fill" style="width:20%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="results-section">
+    <div class="results-header">
+      <span style="font-size:16px">📊</span>
+      <span class="results-header-title">Hasil Estimasi</span>
+      <span id="res-charger-label" style="margin-left:auto; font-size:12px; color:var(--text-muted)"></span>
+    </div>
+    <div class="results-grid">
+      <div class="res-cell highlight">
+        <span class="res-val" id="r-waktu">—</span>
+        <span class="res-unit" id="r-waktu-unit">waktu</span>
+        <span class="res-lbl">Durasi pengisian</span>
+      </div>
+      <div class="res-cell highlight-green">
+        <span class="res-val" id="r-kwh">—</span>
+        <span class="res-unit">kWh (masuk baterai)</span>
+        <span class="res-lbl">Energi nett</span>
+      </div>
+      <div class="res-cell highlight-amber">
+        <span class="res-val" id="r-biaya">—</span>
+        <span class="res-unit">Rupiah</span>
+        <span class="res-lbl">Estimasi biaya</span>
+      </div>
+      <div class="res-cell highlight-purple">
+        <span class="res-val" id="r-soc">—</span>
+        <span class="res-unit">% SoC</span>
+        <span class="res-lbl">Baterai setelah isi</span>
+      </div>
+    </div>
+
+    <!-- INPUT kWh highlight -->
+    <div style="padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.28); border-radius: 12px; padding: 14px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <span style="font-size:18px">🔌</span>
+        <div style="flex:1; min-width:160px">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:rgba(251,191,36,0.7); margin-bottom:3px">Yang harus kamu input di charger / aplikasi</div>
+          <div style="font-size:13px; color:rgba(255,255,255,0.6); line-height:1.5">Karena efisiensi charger ~90%, energi yang ditarik dari jaringan lebih besar dari yang masuk ke baterai.</div>
+        </div>
+        <div style="text-align:right; flex-shrink:0">
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; color:#fbbf24; line-height:1" id="r-wall-kwh">—</div>
+          <div style="font-size:12px; color:rgba(251,191,36,0.65); margin-top:2px">kWh — input di aplikasi</div>
+        </div>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="breakdown-title">Rincian biaya</div>
+      <div id="brow-container"></div>
+    </div>
+    <div class="result-note" id="result-note"></div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+const locDefs = [
+  { id:'rumah',      icon:'🏠', name:'Di Rumah',   sub:'Home charging',  hint:'Menggunakan daya listrik PLN rumah Anda. Tarif lebih murah, cocok untuk pengisian malam hari. Kecepatan tergantung daya MCB rumah.', speeds:['slow1','slow2','normal'], tarifGroup:'rumah', biayaLayanan:0 },
+  { id:'spklu_slow', icon:'🏢', name:'SPKLU AC',   sub:'Slow / normal',  hint:'SPKLU AC tersedia di area parkir mall, hotel, kantor & SPBU tertentu. Tarif dasar: Rp 2.466/kWh sesuai Permen ESDM No. 1/2023.', speeds:['slow1','slow2','normal'], tarifGroup:'spklu', biayaLayanan:0 },
+  { id:'spklu_fast', icon:'⚡', name:'SPKLU Fast', sub:'Fast charging',   hint:'SPKLU fast charging tersedia di SPBU, rest area tol, dan kantor PLN. Tarif: Rp 2.466/kWh + biaya layanan maks Rp 25.000 per sesi.', speeds:['fast','ultrafast'], tarifGroup:'spklu', biayaLayanan:25000 },
+  { id:'spklu_ultra',icon:'🚀', name:'SPKLU Ultra',sub:'Ultrafast / HPC', hint:'SPKLU ultra-fast dan HPC tersedia di lokasi premium & tol utama. Tarif: Rp 2.466/kWh + biaya layanan maks Rp 57.000 per sesi.', speeds:['ultrafast','hyper'], tarifGroup:'spklu', biayaLayanan:57000 },
+];
+const speedDefs = {
+  slow1:     { name:'Slow 1-phase', watt:2.2,  note:'~2,2 kW' },
+  slow2:     { name:'Slow 3-phase', watt:3.7,  note:'~3,7 kW' },
+  normal:    { name:'Normal AC',    watt:7.4,  note:'~7,4 kW' },
+  fast:      { name:'Fast DC',      watt:25,   note:'25–50 kW' },
+  ultrafast: { name:'Ultrafast DC', watt:50,   note:'50–150 kW' },
+  hyper:     { name:'HPC/Hyper',    watt:150,  note:'150–350 kW' },
+};
+const tarifDefs = [
+  { id:'sub450',  badge:'R-1 Subsidi', name:'450 VA subsidi',     price:415,     group:'rumah' },
+  { id:'sub900',  badge:'R-1 Subsidi', name:'900 VA subsidi',     price:605,     group:'rumah' },
+  { id:'r900rtm', badge:'R-1/TR',      name:'900 VA non-subsidi', price:1352,    group:'rumah' },
+  { id:'r1300',   badge:'R-1/TR',      name:'1.300–2.200 VA',     price:1444.70, group:'rumah' },
+  { id:'r3500',   badge:'R-2/TR',      name:'3.500–5.500 VA',     price:1699.53, group:'rumah' },
+  { id:'r6600',   badge:'R-3/TR',      name:'6.600 VA ke atas',   price:1699.53, group:'rumah' },
+  { id:'b2',      badge:'B-2/TR',      name:'Bisnis 6,6–200 kVA', price:1444.70, group:'bisnis' },
+  { id:'spklu',   badge:'SPKLU',       name:'Tarif SPKLU resmi',  price:2466.78, group:'spklu', locked:true },
+];
+
+let curLoc   = locDefs[0];
+let curSpeed = speedDefs.slow2;
+let curTarif = tarifDefs[3];
+let curMode  = 'kwh';
+let curKwh   = 40;
+let curMenit = 60;
+
+function fmt(n) { return Math.round(n).toLocaleString('id-ID'); }
+function fmtKwh(n) { return parseFloat(n.toFixed(2)).toString().replace('.',','); }
+
+function getCap()     { return parseFloat(document.getElementById('batt-cap').value.replace(',','.')) || 60; }
+function getSocFrom() { return parseFloat(document.getElementById('soc-from').value) || 0; }
+
+function getMaxKwh() {
+  const cap = getCap();
+  const soc = getSocFrom();
+  return Math.max(0.5, parseFloat(((1 - soc / 100) * cap).toFixed(2)));
+}
+
+function getMaxMenit() {
+  const eff = 0.90;
+  return Math.max(1, Math.round((getMaxKwh() / eff / curSpeed.watt) * 60));
+}
+
+function kwhToMenit(kwh) {
+  return Math.round((kwh / 0.90 / curSpeed.watt) * 60);
+}
+
+function menitToKwh(menit) {
+  return parseFloat(((menit / 60) * curSpeed.watt * 0.90).toFixed(2));
+}
+
+function fmtDuration(hours) {
+  if (hours < 1/60) return '< 1 menit';
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  if (h === 0) return m + ' menit';
+  if (m === 0) return h + ' jam';
+  return h + ' jam ' + m + ' mnt';
+}
+
+function updateKwhSlider() {
+  const maxK = getMaxKwh();
+  const sl = document.getElementById('kwh-range');
+  sl.max = maxK;
+  sl.step = maxK <= 10 ? 0.1 : 0.5;
+  const clamped = Math.min(curKwh, maxK);
+  sl.value = clamped;
+  document.getElementById('kwh-out').textContent = fmtKwh(clamped) + ' kWh';
+  document.getElementById('kwh-manual').value = clamped;
+  const warn = document.getElementById('kwh-warning');
+  const capVal = document.getElementById('kwh-cap-val');
+  if (curKwh > maxK + 0.01) {
+    capVal.textContent = fmtKwh(maxK);
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+  curKwh = clamped;
+}
+
+function updateMinitSlider() {
+  const maxM = getMaxMenit();
+  const sl = document.getElementById('menit-range');
+  sl.max = maxM;
+  const clamped = Math.min(curMenit, maxM);
+  sl.value = clamped;
+  document.getElementById('menit-out').textContent = clamped + ' menit';
+  document.getElementById('menit-manual').value = clamped;
+  const warn = document.getElementById('menit-warning');
+  const capVal = document.getElementById('menit-cap-val');
+  if (curMenit > maxM + 0.5) {
+    capVal.textContent = maxM;
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+  curMenit = clamped;
+}
+
+function switchMode() {
+  curMode = document.getElementById('input-mode').value;
+  if (curMode === 'kwh') {
+    document.getElementById('panel-kwh').style.display = '';
+    document.getElementById('panel-menit').style.display = 'none';
+    curMenit = kwhToMenit(curKwh);
+    updateKwhSlider();
+  } else {
+    document.getElementById('panel-kwh').style.display = 'none';
+    document.getElementById('panel-menit').style.display = '';
+    curMenit = kwhToMenit(curKwh);
+    updateMinitSlider();
+  }
+  calc();
+}
+
+function syncSoc() {
+  let raw = parseFloat(document.getElementById('soc-from').value);
+  if (isNaN(raw)) raw = 0;
+  const v = Math.min(95, Math.max(0, raw));
+  document.getElementById('soc-from').value = v;
+  document.getElementById('soc-from-lbl').textContent = v + '%';
+  document.getElementById('batt-pct-lbl').textContent = v + '%';
+  document.getElementById('batt-fill').style.width = v + '%';
+  if (curMode === 'kwh') {
+    curKwh = Math.min(curKwh, getMaxKwh());
+    updateKwhSlider();
+  } else {
+    curMenit = Math.min(curMenit, getMaxMenit());
+    updateMinitSlider();
+  }
+  calc();
+}
+
+function syncKwhRange() {
+  const v = parseFloat(document.getElementById('kwh-range').value);
+  curKwh = v;
+  document.getElementById('kwh-out').textContent = fmtKwh(v) + ' kWh';
+  document.getElementById('kwh-manual').value = v;
+  document.getElementById('kwh-warning').style.display = 'none';
+  calc();
+}
+
+function syncKwhManual() {
+  const raw = parseFloat(document.getElementById('kwh-manual').value) || 0.5;
+  const maxK = getMaxKwh();
+  const warn = document.getElementById('kwh-warning');
+  const capVal = document.getElementById('kwh-cap-val');
+  if (raw > maxK) {
+    capVal.textContent = fmtKwh(maxK);
+    warn.style.display = 'block';
+    curKwh = maxK;
+  } else {
+    warn.style.display = 'none';
+    curKwh = Math.max(0.5, raw);
+  }
+  document.getElementById('kwh-range').value = curKwh;
+  document.getElementById('kwh-out').textContent = fmtKwh(curKwh) + ' kWh';
+  calc();
+}
+
+function syncMinitRange() {
+  const v = parseInt(document.getElementById('menit-range').value);
+  curMenit = v;
+  document.getElementById('menit-out').textContent = v + ' menit';
+  document.getElementById('menit-manual').value = v;
+  document.getElementById('menit-warning').style.display = 'none';
+  calc();
+}
+
+function syncMinitManual() {
+  const raw = parseInt(document.getElementById('menit-manual').value) || 1;
+  const maxM = getMaxMenit();
+  const warn = document.getElementById('menit-warning');
+  const capVal = document.getElementById('menit-cap-val');
+  if (raw > maxM) {
+    capVal.textContent = maxM;
+    warn.style.display = 'block';
+    curMenit = maxM;
+  } else {
+    warn.style.display = 'none';
+    curMenit = Math.max(1, raw);
+  }
+  document.getElementById('menit-range').value = curMenit;
+  document.getElementById('menit-out').textContent = curMenit + ' menit';
+  calc();
+}
+
+function calc() {
+  const cap     = getCap();
+  const socFrom = getSocFrom();
+  const maxKwh  = getMaxKwh();
+  const eff     = 0.90;
+
+  let actKwh;
+  if (curMode === 'kwh') {
+    actKwh = Math.min(curKwh, maxKwh);
+  } else {
+    const fromTime = menitToKwh(curMenit);
+    actKwh = Math.min(fromTime, maxKwh);
+  }
+
+  actKwh = Math.max(0, actKwh);
+  const wallKwh  = actKwh / eff;
+  const hours    = wallKwh / curSpeed.watt;
+  const biayaL   = wallKwh * curTarif.price;
+  const biayaS   = curLoc.biayaLayanan;
+  const total    = biayaL + biayaS;
+  const socAfter = Math.min(100, socFrom + Math.round((actKwh / cap) * 100));
+
+  const equivMenit = kwhToMenit(actKwh);
+  const equivKwh   = menitToKwh(curMenit);
+  const badge = document.getElementById('mode-equiv-badge');
+  if (curMode === 'kwh') {
+    badge.textContent = '≈ ' + equivMenit + ' menit dengan charger ini';
+  } else {
+    badge.textContent = '≈ ' + fmtKwh(Math.min(equivKwh, maxKwh)) + ' kWh masuk';
+  }
+
+  document.getElementById('r-waktu').textContent      = fmtDuration(hours);
+  document.getElementById('r-waktu-unit').textContent = hours >= 1 ? 'jam' : 'menit';
+  document.getElementById('r-kwh').textContent        = fmtKwh(actKwh);
+  document.getElementById('r-wall-kwh').textContent   = fmtKwh(wallKwh);
+  document.getElementById('r-biaya').textContent      = 'Rp ' + fmt(total);
+  document.getElementById('r-soc').textContent        = socAfter + '%';
+  document.getElementById('res-charger-label').textContent = curSpeed.name + ' · ' + curSpeed.watt + ' kW';
+
+  document.getElementById('prog-from-lbl').textContent = 'Dari ' + Math.round(socFrom) + '%';
+  document.getElementById('prog-to-lbl').textContent   = socAfter + '%';
+  document.getElementById('prog-fill').style.width     = Math.max(2, socAfter) + '%';
+
+  const rows = [
+    { lbl:'Energi nett (masuk baterai)',             val: fmtKwh(actKwh) + ' kWh' },
+    { lbl:'Energi dari jaringan (eff. 90%)',         val: fmtKwh(wallKwh) + ' kWh' },
+    { lbl:'Tarif — ' + curTarif.badge + ' (' + curTarif.name + ')', val: 'Rp ' + fmt(biayaL) },
+  ];
+  if (biayaS > 0) rows.push({ lbl:'Biaya layanan SPKLU (maks per sesi)', val:'Rp ' + fmt(biayaS) });
+
+  const bc = document.getElementById('brow-container');
+  bc.innerHTML = rows.map(r =>
+    `<div class="brow"><span class="brow-label">${r.lbl}</span><span class="brow-val">${r.val}</span></div>`
+  ).join('') + `<div class="brow total-row"><span class="brow-label">Total estimasi biaya</span><span class="brow-val">Rp ${fmt(total)}</span></div>`;
+
+  document.getElementById('result-note').innerHTML =
+    '* Estimasi menggunakan efisiensi charger 90%. Waktu aktual bervariasi tergantung kondisi baterai, suhu, dan kapasitas charger kendaraan. ' +
+    'Tarif SPKLU mengacu <strong style="color:rgba(255,255,255,0.5)">Permen ESDM No. 1/2023</strong> &amp; tarif PLN Q1 2025.';
+}
+
+function buildLoc() {
+  const g = document.getElementById('loc-grid');
+  g.innerHTML = '';
+  locDefs.forEach(l => {
+    const d = document.createElement('div');
+    d.className = 'chip' + (l.id === curLoc.id ? ' active-green' : '');
+    d.innerHTML = `<span class="chip-icon">${l.icon}</span><span class="chip-name">${l.name}</span><span class="chip-sub">${l.sub}</span>`;
+    d.onclick = () => {
+      curLoc = l;
+      curTarif = l.tarifGroup === 'spklu' ? tarifDefs.find(t => t.id === 'spklu') : tarifDefs[3];
+      curSpeed = speedDefs[l.speeds[0]];
+      buildLoc(); buildSpeed(); buildTarif();
+      if (curMode === 'kwh') updateKwhSlider(); else updateMinitSlider();
+      calc();
+    };
+    g.appendChild(d);
+  });
+  document.getElementById('loc-hint').textContent = curLoc.hint;
+}
+
+function buildSpeed() {
+  const g = document.getElementById('speed-grid');
+  g.innerHTML = '';
+  curLoc.speeds.forEach(sid => {
+    const s = speedDefs[sid];
+    const d = document.createElement('div');
+    d.className = 'chip' + (s === curSpeed ? ' active-amber' : '');
+    d.innerHTML = `<span class="chip-name">${s.name}</span><span class="chip-value">${s.watt} kW</span><span class="chip-sub">${s.note}</span>`;
+    d.onclick = () => {
+      curSpeed = s;
+      buildSpeed();
+      if (curMode === 'menit') updateMinitSlider();
+      calc();
+    };
+    g.appendChild(d);
+  });
+}
+
+function buildTarif() {
+  const g = document.getElementById('tarif-grid');
+  g.innerHTML = '';
+  tarifDefs.forEach(t => {
+    const locked = t.locked && curLoc.tarifGroup !== 'spklu';
+    const d = document.createElement('div');
+    d.className = 'chip' + (t.id === curTarif.id ? ' active-blue' : '');
+    d.style.opacity = locked ? '0.35' : '1';
+    d.innerHTML = `<span class="chip-badge">${t.badge}</span><span class="chip-name">${t.name}</span><span class="chip-value">Rp ${fmt(t.price)}/kWh</span>`;
+    d.onclick = () => { if (!locked) { curTarif = t; buildTarif(); calc(); } };
+    g.appendChild(d);
+  });
+}
+
+function buildBattPresets() {
+  [40, 60, 72.6, 77.4, 82, 100].forEach(v => {
+    const b = document.createElement('span');
+    b.className = 'preset-pill';
+    b.textContent = v % 1 === 0 ? v + ' kWh' : v.toString().replace('.',',') + ' kWh';
+    b.onclick = () => { document.getElementById('batt-cap').value = v; syncCapChange(); };
+    document.getElementById('batt-presets').appendChild(b);
+  });
+}
+
+function syncCapChange() {
+  if (curMode === 'kwh') updateKwhSlider(); else updateMinitSlider();
+  calc();
+}
+
+function buildTargetPresets() {
+  const presets = [
+    { lbl:'↑ 80%',    fn: () => { curKwh = Math.min(getKwhTo(80), getMaxKwh());  curMode='kwh'; document.getElementById('input-mode').value='kwh'; switchMode(); } },
+    { lbl:'↑ 100%',   fn: () => { curKwh = getMaxKwh();                           curMode='kwh'; document.getElementById('input-mode').value='kwh'; switchMode(); } },
+    { lbl:'+10 kWh',  fn: () => { curKwh = Math.min(10, getMaxKwh());             curMode='kwh'; document.getElementById('input-mode').value='kwh'; switchMode(); } },
+    { lbl:'+20 kWh',  fn: () => { curKwh = Math.min(20, getMaxKwh());             curMode='kwh'; document.getElementById('input-mode').value='kwh'; switchMode(); } },
+    { lbl:'30 menit', fn: () => { curMenit = Math.min(30, getMaxMenit());          curMode='menit'; document.getElementById('input-mode').value='menit'; switchMode(); } },
+    { lbl:'1 jam',    fn: () => { curMenit = Math.min(60, getMaxMenit());          curMode='menit'; document.getElementById('input-mode').value='menit'; switchMode(); } },
+  ];
+  presets.forEach(p => {
+    const b = document.createElement('span');
+    b.className = 'preset-pill';
+    b.textContent = p.lbl;
+    b.onclick = p.fn;
+    document.getElementById('target-presets').appendChild(b);
+  });
+}
+
+function buildMinitPresets() {
+  [15, 30, 45, 60, 90, 120].forEach(m => {
+    const b = document.createElement('span');
+    b.className = 'preset-pill';
+    b.textContent = m < 60 ? m + ' mnt' : (m/60) + ' jam';
+    b.onclick = () => {
+      const maxM = getMaxMenit();
+      curMenit = Math.min(m, maxM);
+      document.getElementById('menit-range').value = curMenit;
+      document.getElementById('menit-out').textContent = curMenit + ' menit';
+      document.getElementById('menit-manual').value = curMenit;
+      if (m > maxM) {
+        document.getElementById('menit-cap-val').textContent = maxM;
+        document.getElementById('menit-warning').style.display = 'block';
+      } else {
+        document.getElementById('menit-warning').style.display = 'none';
+      }
+      calc();
+    };
+    document.getElementById('menit-presets').appendChild(b);
+  });
+}
+
+function getKwhTo(pct) {
+  const diff = pct - getSocFrom();
+  return diff > 0 ? parseFloat((getCap() * diff / 100).toFixed(2)) : 0.5;
+}
+
+document.getElementById('kwh-range').oninput  = syncKwhRange;
+document.getElementById('kwh-manual').oninput = syncKwhManual;
+document.getElementById('menit-range').oninput  = syncMinitRange;
+document.getElementById('menit-manual').oninput = syncMinitManual;
+document.getElementById('batt-cap').oninput   = syncCapChange;
+
+buildLoc(); buildSpeed(); buildTarif();
+buildBattPresets(); buildTargetPresets(); buildMinitPresets();
+updateKwhSlider();
+syncSoc();
+calc();
+</script>
+</body>
+</html>
